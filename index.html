@@ -274,6 +274,37 @@ body.student-entry-locked{overflow:hidden}body.student-entry-locked>.topbar,body
   <button class="entry-submit" type="submit">Xác nhận và vào phòng tư vấn</button>
  </form>
 </section>
+</section>
+<script>
+/* Xử lý cổng thông tin thật sớm để nút xác nhận vẫn hoạt động nếu một script khác gặp lỗi. */
+(function(){
+  window.studentProfile = window.studentProfile || null;
+  const form = document.getElementById('studentEntryForm');
+  if (!form) return;
+  form.addEventListener('submit', function(event) {
+    event.preventDefault();
+    const fullName = document.getElementById('studentFullName')?.value.trim() || '';
+    const school = document.getElementById('studentSchool')?.value.trim() || '';
+    const className = document.getElementById('studentClass')?.value.trim() || '';
+    if (!fullName || !school || !className) {
+      form.reportValidity();
+      return;
+    }
+    window.studentProfile = { fullName, school, className };
+    document.body.classList.remove('student-entry-locked');
+    const gate = document.getElementById('student-entry-gate');
+    if (gate) gate.remove();
+    const userLabel = document.querySelector('.user-pill span');
+    if (userLabel) {
+      const safeName = fullName.replace(/[&<>"']/g, function(ch) {
+        return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];
+      });
+      userLabel.innerHTML = 'Xin chào,<br>' + safeName;
+    }
+    document.dispatchEvent(new CustomEvent('student-profile-ready', {detail: window.studentProfile}));
+  });
+})();
+</script>
 <header class="topbar"><div class="brand"><div class="brand-mark" aria-hidden="true">💗</div><div><h1>Cô Hường</h1><p>Tư vấn tâm lý học đường</p></div></div><div class="top-note">Lắng nghe – Thấu hiểu – Đồng hành ♡</div><div class="top-actions"><label class="searchbox">⌕ <input id="siteSearch" placeholder="Tìm kiếm..." aria-label="Tìm kiếm"></label><button class="notification" aria-label="Thông báo" data-contact>♧<b>2</b></button><div class="user-pill"><img src="https://raw.githubusercontent.com/nguyenthuhuong7993-ai/Phong_Tu_Van_Tam_Ly/main/Co_Huong.jpg" alt="Ảnh đại diện"><span>Xin chào,<br>Học sinh THCS</span></div></div></header>
 <div class="app-layout">
 <aside class="sidebar"><nav class="side-links" aria-label="Menu chính"><button class="side-link active" data-page="home"><span class="nav-ico">⌂</span>Trang chủ</button><button class="side-link" data-page="emotion-scan"><span class="nav-ico">📷</span>Quét mã cảm xúc</button><button class="side-link" data-page="emotion"><span class="nav-ico">☻</span>Nhật ký cảm xúc</button><button class="side-link" data-open-chat><span class="nav-ico">▣</span>Trò chuyện với Cô Hường</button><button class="side-link" data-page="sharing"><span class="nav-ico">♡</span>Góc chia sẻ</button><button class="side-link" data-page="resources"><span class="nav-ico">▤</span>Tài liệu & Kỹ năng sống</button><button class="side-link" data-page="feedback"><span class="nav-ico">💙</span>Đánh giá sau tư vấn</button><button class="side-link" data-page="booking"><span class="nav-ico">▦</span>Lịch hẹn tư vấn</button><button class="side-link" data-contact><span class="nav-ico">⚙</span>Cài đặt & hỗ trợ</button></nav><div class="side-quote">“Bạn không đơn độc,<br>luôn có người lắng nghe!”<span>♡</span></div><div class="side-landscape" aria-hidden="true"></div><div class="school-foot"><span class="school-icon">🏫</span><div><strong>Trường THCS Phụng Công</strong><br>Đồng hành cùng học sinh</div></div></aside>
@@ -4675,20 +4706,7 @@ window.addEventListener("load",()=>{
   if("serviceWorker" in navigator && location.protocol.startsWith("http"))navigator.serviceWorker.register("./sw.js").catch(e=>console.warn("PWA:",e));
 });
 
-// Thu thập thông tin học sinh trước khi mở giao diện phòng tư vấn.
-window.studentProfile = null;
-$('studentEntryForm').addEventListener('submit',event=>{
-  event.preventDefault();
-  const fullName=$('studentFullName').value.trim();
-  const school=$('studentSchool').value.trim();
-  const className=$('studentClass').value.trim();
-  if(!fullName||!school||!className)return;
-  window.studentProfile={fullName,school,className};
-  document.body.classList.remove('student-entry-locked');
-  $('student-entry-gate').remove();
-  const userLabel=document.querySelector('.user-pill span');
-  if(userLabel)userLabel.innerHTML='Xin chào,<br>'+fullName.replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
-});
+// Thông tin học sinh được thu thập bởi trình xử lý sớm ngay sau biểu mẫu.
 
 // Biểu mẫu đánh giá sau tư vấn: chỉ tổng kết trong phiên hiện tại, không gửi dữ liệu đi.
 let selectedFeedbackFeeling = '';
