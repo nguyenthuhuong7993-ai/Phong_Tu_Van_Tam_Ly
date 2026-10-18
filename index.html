@@ -416,7 +416,6 @@ function extractReply(data){
   return "";
 }
 
-
 /* Kho kiến thức cục bộ ghép từ index_chatbot_kienthuc (2).html.
    Dùng khi Cloudflare Worker/AI không kết nối được. */
 const localKnowledge = [{"id":0,"q":"chào xin chào hello hi","a":"Chào em! 👋 Cô Hường rất vui được trò chuyện cùng em. Em muốn chia sẻ điều gì với cô hôm nay?"},{"id":0,"q":"em muốn được tư vấn em muốn tâm sự em đang gặp khó khăn","a":"Được chứ em. 💜 Cô Hường đang lắng nghe em đây. Em cứ chia sẻ điều khiến em lo lắng hoặc khó khăn, cô sẽ cùng em tìm cách tháo gỡ từng bước."},{"id":0,"q":"cảm ơn cô cảm ơn","a":"Không có gì đâu em. 🌷 Khi cần chia sẻ, em có thể tiếp tục trò chuyện cùng cô."},
@@ -4480,6 +4479,13 @@ const localKnowledge = [{"id":0,"q":"chào xin chào hello hi","a":"Chào em! �
 {"id":4058,"q":"Thầy/cô có thể tư vấn cho em khi muốn lập kế hoạch cho tương lai nhưng không biết bắt đầu từ đâu không ạ?","a":"Cô mong em dành cho mình thời gian và thử: Hãy khởi đầu với ba việc nhỏ: ghi lại điều mình thích, chọn một kỹ năng muốn rèn trong tháng này và tìm hiểu một nghề hoặc một chương trình học đang tò mò. Sau đó trao đổi với gia đình hoặc giáo viên để kiểm tra thông tin. Kế hoạch có thể điều chỉnh khi em hiểu bản thân hơn. Nếu em muốn được tư vấn trực tiếp hãy liên hệ với cô, Cô Hường – Giáo viên tư vấn tâm lý Trường THCS Phụng Công - 0989836893"},
 {"id":4059,"q":"Nếu tình trạng này xảy ra với em, em nên làm thế nào: Em muốn lập kế hoạch cho tương lai nhưng không biết bắt đầu từ đâu?","a":"Một hướng em có thể áp dụng là: Em hãy bắt đầu bằng ba việc nhỏ: ghi lại điều mình thích, chọn một kỹ năng muốn rèn trong tháng này và tìm hiểu một nghề hoặc một chương trình học đang tò mò. Sau đó nói chuyện cùng gia đình hoặc giáo viên để kiểm tra thông tin. Kế hoạch hoàn toàn có thể điều chỉnh khi em hiểu bản thân hơn. Nếu em muốn được tư vấn trực tiếp hãy liên hệ với cô, Cô Hường – Giáo viên tư vấn tâm lý Trường THCS Phụng Công - 0989836893"},
 {"id":4060,"q":"Em cần lời khuyên về việc này: Em muốn lập kế hoạch cho tương lai nhưng không biết bắt đầu từ đâu?","a":"Hãy bắt đầu từ điều vừa sức với em: Em hãy bắt đầu bằng ba việc nhỏ: ghi lại điều mình thích, chọn một kỹ năng muốn rèn trong tháng này và tìm hiểu một nghề hoặc một chương trình học đang tò mò. Sau đó trao đổi với gia đình hoặc giáo viên để kiểm tra thông tin. Kế hoạch có thể điều chỉnh khi em hiểu bản thân hơn. Nếu em muốn được tư vấn trực tiếp hãy liên hệ với cô, Cô Hường – Giáo viên tư vấn tâm lý Trường THCS Phụng Công - 0989836893"},
+{"id":4061,"q":"em buồn lắm cô ơi","a":"Cô Hường đây, cô đang lắng nghe em nhé. ❤️
+Cô cảm ơn em vì đã chia sẻ với cô. Chắc hẳn lúc này em đang có nhiều điều khiến lòng mình nặng trĩu. Em không cần phải cố tỏ ra vui vẻ khi trong lòng đang buồn đâu.
+Nếu em sẵn sàng, em hãy kể cô nghe nhé: Điều gì đã khiến em buồn như vậy? Là chuyện học tập, bạn bè, gia đình hay có điều gì khác đang làm em khó chịu?
+Cô sẽ lắng nghe em, không trách mắng hay phán xét em. Mình cứ từ từ nói chuyện nhé, em không cần phải kể hết mọi thứ ngay một lúc đâu. 🌷"},
+{"id":4062,"q":"tự tử","a":"Cô cảm ơn em vì đã chia sẻ với cô. Chắc hẳn lúc này em đang có nhiều điều khiến lòng mình nặng trĩu. Em không cần phải cố tỏ ra vui vẻ khi trong lòng đang buồn đâu.
+Nếu em sẵn sàng, em hãy kể cô nghe nhé: Điều gì đã khiến em buồn như vậy? Là chuyện học tập, bạn bè, gia đình hay có điều gì khác đang làm em khó chịu?
+Cô sẽ lắng nghe em, không trách mắng hay phán xét em. Mình cứ từ từ nói chuyện nhé, em không cần phải kể hết mọi thứ ngay một lúc đâu. 🌷"},
        
 ];
 function localNormalize(s){
