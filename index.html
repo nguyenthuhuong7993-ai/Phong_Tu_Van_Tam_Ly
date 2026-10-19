@@ -370,7 +370,7 @@ body.student-entry-locked{overflow:hidden}body.student-entry-locked>.topbar,body
 /* CẤU HÌNH TÍCH HỢP AI:
    Frontend gọi Cloudflare Worker; KHÔNG đặt API key ở đây.
    Endpoint đã được thiết lập trong các bước trước. */
-const WORKER_URL = "https://co-huong-tu-van-tam-ly-thcs.nguyenthuhuong7993.workers.dev";
+const WORKER_URL = "https://phong-tu-van-tam-ly.nguyenthuhuong7993.workers.dev/";
 const COUNSELOR = {
   name: "Cô Hường - Giáo viên tư vấn tâm lý học đường",
   school: "Trường THCS",
@@ -418,7 +418,7 @@ function extractReply(data){
 }
 
 
-/* Kho kiến thức cục bộ ghép từ index_chatbot_kienthuc (2).html.
+/* Kho kiến thức cục bộ.
    Dùng khi Cloudflare Worker/AI không kết nối được. */
 const localKnowledge = [{"id":0,"q":"chào xin chào hello hi","a":"Chào em! 👋 Cô rất vui được trò chuyện cùng em. Em muốn chia sẻ điều gì với cô hôm nay?"},{"id":0,"q":"em muốn được tư vấn em muốn tâm sự em đang gặp khó khăn","a":"Được chứ em. 💜 Cô đang lắng nghe em đây. Em cứ chia sẻ điều khiến em lo lắng hoặc khó khăn, cô sẽ cùng em tìm cách tháo gỡ từng bước."},{"id":0,"q":"cảm ơn cô","a":"Không có gì đâu em. 🌷 Khi cần chia sẻ, em có thể tiếp tục trò chuyện cùng cô."},
 {"id":1,"q":"Em hay buồn vô cớ là sao ạ?","a":"Có thể do căng thẳng hoặc thay đổi tuổi dậy thì. Cảm xúc của em đáng được lắng nghe; em không cần tự trách mình vì đang buồn, lo lắng hay tức giận. Em có thể thử gọi tên cảm xúc, hít thở chậm, viết ra điều khiến mình khó chịu và chọn một người đáng tin để chia sẻ. Nếu tình trạng kéo dài, ảnh hưởng giấc ngủ, ăn uống, học tập hoặc khiến em thấy không an toàn, hãy báo cho người lớn và tìm hỗ trợ trực tiếp. Em muốn kể cô nghe chuyện gì thường xảy ra trước khi em có cảm giác này không?"},
