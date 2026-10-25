@@ -1,1 +1,435 @@
 
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CARE AI - Quản lý Bảng lan tỏa yêu thương</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#f3f8fc;
+  color:#24364b;
+}
+header{
+  background:linear-gradient(120deg,#087e90,#4384cb);
+  color:white;
+  padding:30px 18px;
+  text-align:center;
+}
+header h1{font-size:26px;margin:0 0 10px}
+header p{margin:0;line-height:1.6}
+main{max-width:1050px;margin:24px auto;padding:0 16px}
+.panel{
+  background:white;
+  border:1px solid #e1e9f0;
+  border-radius:16px;
+  padding:22px;
+  margin-bottom:20px;
+  box-shadow:0 4px 16px #163d6210;
+}
+h2{font-size:19px;margin:0 0 16px}
+label{display:block;font-weight:bold;margin-bottom:9px}
+input{
+  width:100%;
+  padding:13px;
+  border:1px solid #c7d7e5;
+  border-radius:10px;
+  font-size:15px;
+}
+button{
+  border:0;
+  border-radius:9px;
+  padding:11px 15px;
+  cursor:pointer;
+  font-size:14px;
+  font-weight:bold;
+}
+.primary{background:#087e90;color:white}
+.approve{background:#d9f5e6;color:#11643d}
+.reject{background:#fff0d9;color:#92570c}
+.delete{background:#ffe7e7;color:#a12828}
+.secondary{background:#eaf0f6;color:#34485d}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:15px}
+.toolbar{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:18px}
+.tab{background:#eaf0f6;color:#34485d}
+.tab.active{background:#087e90;color:white}
+.item{
+  border:1px solid #dce7ef;
+  border-radius:12px;
+  padding:17px;
+  margin-bottom:13px;
+}
+.content{
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  line-height:1.7;
+  margin:12px 0;
+}
+.meta{color:#68798b;font-size:13px}
+.status{
+  display:inline-block;
+  background:#eef2f6;
+  border-radius:30px;
+  padding:5px 10px;
+  font-size:12px;
+  font-weight:bold;
+}
+.notice{
+  background:#edf7ff;
+  padding:12px;
+  border-radius:9px;
+  line-height:1.6;
+  font-size:14px;
+}
+.error{color:#b42318}
+.success{color:#147348}
+#message{margin-top:12px;line-height:1.6}
+[hidden]{display:none!important}
+footer{
+  text-align:center;
+  color:#68798b;
+  padding:20px;
+  font-size:13px;
+}
+@media(max-width:600px){
+  header h1{font-size:21px}
+  .panel{padding:16px}
+  button{flex:1}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>💙 CARE AI</h1>
+  <p>QUẢN LÝ BẢNG LAN TỎA YÊU THƯƠNG</p>
+  <p>Không gian kiểm duyệt lời nhắn dành cho giáo viên</p>
+</header>
+
+<main>
+  <section class="panel" id="loginPanel">
+    <h2>🔐 Xác thực giáo viên</h2>
+    <label for="token">Khóa quản trị ADMIN_TOKEN</label>
+    <input
+      id="token"
+      type="password"
+      placeholder="Nhập khóa quản trị"
+      autocomplete="off"
+    >
+    <div class="actions">
+      <button class="primary" id="loginBtn">
+        Đăng nhập
+      </button>
+    </div>
+    <p class="notice">
+      Khóa quản trị chỉ được giữ trong bộ nhớ của
+      trang đang mở. Không chia sẻ khóa với học sinh.
+      Hãy đăng xuất sau khi kiểm duyệt.
+    </p>
+    <p id="loginMessage" role="status"></p>
+  </section>
+
+  <section class="panel" id="dashboard" hidden>
+    <div class="actions" style="justify-content:space-between">
+      <h2>📋 Danh sách lời nhắn</h2>
+      <button class="secondary" id="logoutBtn">
+        Đăng xuất
+      </button>
+    </div>
+
+    <p class="notice">
+      Chỉ phê duyệt nội dung phù hợp và không chứa
+      thông tin nhận dạng cá nhân. Những lời nhắn
+      thể hiện nhu cầu hỗ trợ tâm lý cần được chuyển
+      sang quy trình tư vấn riêng, không công khai.
+    </p>
+
+    <div class="toolbar">
+      <button class="tab active" data-status="pending">
+        ⏳ Chờ duyệt (<span id="countPending">0</span>)
+      </button>
+      <button class="tab" data-status="approved">
+        ✅ Đã duyệt (<span id="countApproved">0</span>)
+      </button>
+      <button class="tab" data-status="rejected">
+        ❌ Từ chối (<span id="countRejected">0</span>)
+      </button>
+      <button class="secondary" id="refreshBtn">
+        🔄 Làm mới
+      </button>
+    </div>
+
+    <div id="message" role="status"></div>
+    <div id="list"></div>
+  </section>
+</main>
+
+<footer>
+  CARE AI - Hệ thống hỗ trợ tâm lý học đường
+</footer>
+
+<script>
+"use strict";
+
+const API =
+  "https://care-sharing-api.nguyenthuhuong7993.workers.dev";
+
+let adminToken = "";
+let allShares = [];
+let currentStatus = "pending";
+
+const $ = id => document.getElementById(id);
+
+function showLoginMessage(text, isError = false) {
+  $("loginMessage").textContent = text;
+  $("loginMessage").className = isError ? "error" : "success";
+}
+
+function showMessage(text, isError = false) {
+  $("message").textContent = text;
+  $("message").className = isError ? "error" : "success";
+}
+
+async function requestAPI(path, options = {}) {
+  const headers = {
+    Authorization: "Bearer " + adminToken,
+    ...options.headers
+  };
+
+  const response = await fetch(API + path, {
+    ...options,
+    headers,
+    cache: "no-store"
+  });
+
+  let data;
+  try {
+    data = await response.json();
+  } catch {
+    throw new Error("Máy chủ không trả về JSON hợp lệ.");
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      data.error || "Yêu cầu thất bại: " + response.status
+    );
+  }
+
+  return data;
+}
+
+async function login() {
+  const token = $("token").value.trim();
+
+  if (token.length < 32) {
+    showLoginMessage(
+      "Khóa quản trị phải có ít nhất 32 ký tự.",
+      true
+    );
+    return;
+  }
+
+  adminToken = token;
+  $("loginBtn").disabled = true;
+  showLoginMessage("Đang kiểm tra quyền truy cập...");
+
+  try {
+    await loadShares();
+    $("token").value = "";
+    $("loginPanel").hidden = true;
+    $("dashboard").hidden = false;
+    showMessage("Đăng nhập thành công.");
+  } catch (error) {
+    adminToken = "";
+    showLoginMessage(
+      "Không thể đăng nhập: " + error.message,
+      true
+    );
+  } finally {
+    $("loginBtn").disabled = false;
+  }
+}
+
+async function loadShares() {
+  const data = await requestAPI("/api/admin/shares");
+  allShares = Array.isArray(data.shares) ? data.shares : [];
+  renderShares();
+}
+
+function renderShares() {
+  for (const status of ["pending","approved","rejected"]) {
+    const count = allShares.filter(
+      item => item.status === status
+    ).length;
+
+    const target = {
+      pending:"countPending",
+      approved:"countApproved",
+      rejected:"countRejected"
+    }[status];
+
+    $(target).textContent = count;
+  }
+
+  document.querySelectorAll(".tab").forEach(button => {
+    button.classList.toggle(
+      "active",
+      button.dataset.status === currentStatus
+    );
+  });
+
+  const list = $("list");
+  list.replaceChildren();
+
+  const filtered = allShares.filter(
+    item => item.status === currentStatus
+  );
+
+  if (filtered.length === 0) {
+    const empty = document.createElement("p");
+    empty.className = "notice";
+    empty.textContent = "Không có lời nhắn trong mục này.";
+    list.appendChild(empty);
+    return;
+  }
+
+  for (const item of filtered) {
+    const card = document.createElement("article");
+    card.className = "item";
+
+    const heading = document.createElement("div");
+    heading.className = "meta";
+    heading.textContent =
+      "Mã #" + item.id +
+      " | Gửi lúc: " + (item.created_at || "Không rõ");
+
+    const content = document.createElement("p");
+    content.className = "content";
+    content.textContent = item.content || "";
+
+    const status = document.createElement("span");
+    status.className = "status";
+    status.textContent = {
+      pending:"Chờ duyệt",
+      approved:"Đã duyệt",
+      rejected:"Đã từ chối"
+    }[item.status] || item.status;
+
+    const actions = document.createElement("div");
+    actions.className = "actions";
+
+    if (item.status !== "approved") {
+      actions.appendChild(
+        makeButton("✅ Phê duyệt","approve",() =>
+          updateStatus(item.id,"approved")
+        )
+      );
+    }
+
+    if (item.status !== "rejected") {
+      actions.appendChild(
+        makeButton("❌ Từ chối","reject",() =>
+          updateStatus(item.id,"rejected")
+        )
+      );
+    }
+
+    actions.appendChild(
+      makeButton("🗑️ Xóa","delete",() =>
+        deleteShare(item.id)
+      )
+    );
+
+    card.append(heading,content,status,actions);
+    list.appendChild(card);
+  }
+}
+
+function makeButton(label, className, action) {
+  const button = document.createElement("button");
+  button.textContent = label;
+  button.className = className;
+  button.addEventListener("click", action);
+  return button;
+}
+
+async function updateStatus(id, status) {
+  const verb = status === "approved"
+    ? "phê duyệt"
+    : "từ chối";
+
+  if (!confirm("Bạn có chắc muốn " + verb +
+               " lời nhắn #" + id + "?")) {
+    return;
+  }
+
+  try {
+    await requestAPI("/api/admin/shares/" + id, {
+      method:"PATCH",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({status})
+    });
+
+    await loadShares();
+    showMessage("Đã " + verb + " lời nhắn #" + id + ".");
+  } catch (error) {
+    showMessage(error.message,true);
+  }
+}
+
+async function deleteShare(id) {
+  if (!confirm(
+    "Xóa vĩnh viễn lời nhắn #" + id + "?"
+  )) return;
+
+  try {
+    await requestAPI("/api/admin/shares/" + id, {
+      method:"DELETE"
+    });
+
+    await loadShares();
+    showMessage("Đã xóa lời nhắn #" + id + ".");
+  } catch (error) {
+    showMessage(error.message,true);
+  }
+}
+
+function logout() {
+  adminToken = "";
+  allShares = [];
+  $("token").value = "";
+  $("dashboard").hidden = true;
+  $("loginPanel").hidden = false;
+  $("loginMessage").textContent = "";
+  $("list").replaceChildren();
+}
+
+$("loginBtn").addEventListener("click",login);
+
+$("token").addEventListener("keydown",event => {
+  if (event.key === "Enter") login();
+});
+
+$("logoutBtn").addEventListener("click",logout);
+
+$("refreshBtn").addEventListener("click",async () => {
+  try {
+    await loadShares();
+    showMessage("Đã cập nhật danh sách.");
+  } catch (error) {
+    showMessage(error.message,true);
+  }
+});
+
+document.querySelectorAll(".tab").forEach(button => {
+  button.addEventListener("click",() => {
+    currentStatus = button.dataset.status;
+    renderShares();
+  });
+});
+</script>
+</body>
+</html>
