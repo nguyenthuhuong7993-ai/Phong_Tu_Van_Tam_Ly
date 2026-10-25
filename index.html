@@ -5623,11 +5623,11 @@ $('siteSearch').addEventListener('keydown',e=>{if(e.key==='Enter'){const q=e.tar
       const like = document.createElement("button");like.type="button";like.className="care-social-action";
       const comment = document.createElement("button");comment.type="button";comment.className="care-social-action";
       const refreshActions=()=>{
-        like.textContent=state.liked?"❤️":"🤍";
+        like.textContent=(state.liked?"❤️":"🤍")+(state.liked?" 1":"");
         like.setAttribute("aria-pressed",String(!!state.liked));
         like.setAttribute("aria-label",state.liked?"Bỏ thả tim":"Thả tim");
         like.title=state.liked?"Bỏ thả tim":"Thả tim";
-        comment.textContent="💬";
+        comment.textContent="💬"+((state.comments?.length||0)>0?" "+state.comments.length:"");
         comment.setAttribute("aria-label","Xem và viết bình luận ("+(state.comments?.length||0)+")");
         comment.title="Bình luận";
       };
