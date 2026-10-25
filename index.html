@@ -513,6 +513,9 @@ body.student-entry-locked{overflow:hidden}body.student-entry-locked>.topbar,body
 .care-social-actions{display:flex;gap:20px;border-top:1px solid #edf0f7;padding-top:9px}
 .care-social-action{background:transparent;border:0;color:#5273aa;font-size:12px;padding:5px 2px;font-weight:650}
 .care-social-action[aria-pressed="true"]{color:#e44479}
+.care-social-actions{align-items:center;gap:16px}
+.care-social-action{font-size:22px;line-height:1;min-width:38px;min-height:38px;display:inline-flex;align-items:center;justify-content:center;border-radius:50%}
+.care-social-action:hover{background:#f7eefa}
 .care-social-comments{padding:10px 0 0;display:grid;gap:8px}
 .care-social-comments[hidden]{display:none!important}
 .care-social-comments input,.care-social-comments textarea{width:100%;border:1px solid #dce5f5;border-radius:10px;padding:9px;background:#fff;color:#193b79;resize:vertical}
@@ -5620,9 +5623,13 @@ $('siteSearch').addEventListener('keydown',e=>{if(e.key==='Enter'){const q=e.tar
       const like = document.createElement("button");like.type="button";like.className="care-social-action";
       const comment = document.createElement("button");comment.type="button";comment.className="care-social-action";
       const refreshActions=()=>{
-        like.textContent=(state.liked?"❤️":"🤍")+" "+(state.liked?"Đã thích":"Thả tim");
+        like.textContent=state.liked?"❤️":"🤍";
         like.setAttribute("aria-pressed",String(!!state.liked));
-        comment.textContent="💬 "+(state.comments?.length||0)+" Bình luận";
+        like.setAttribute("aria-label",state.liked?"Bỏ thả tim":"Thả tim");
+        like.title=state.liked?"Bỏ thả tim":"Thả tim";
+        comment.textContent="💬";
+        comment.setAttribute("aria-label","Xem và viết bình luận ("+(state.comments?.length||0)+")");
+        comment.title="Bình luận";
       };
       like.addEventListener("click",()=>{state.liked=!state.liked;reactions[id]=state;persistReactions();refreshActions();});
       actions.append(like,comment);card.appendChild(actions);
