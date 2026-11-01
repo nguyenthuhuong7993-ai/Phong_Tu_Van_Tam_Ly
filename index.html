@@ -1,23 +1,51 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CARE AI - Trợ lý Tư vấn Tâm lý Học đường</title>
+<meta charset="utf-8"/><meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
+<meta content="#eef7ff" name="theme-color"/><meta content="CARE - Trợ lý AI tư vấn tâm lý học đường. Lắng nghe, thấu hiểu, đồng hành cùng học sinh." name="description"/>
+<link href="manifest.json" rel="manifest"/><link href="icon.svg" rel="icon" type="image/svg+xml"/>
+<title>CARE - Trợ lý AI tư vấn tâm lý học đường</title>
+<style>
+:root{--blue:#2477ee;--blue-dark:#123d91;--ink:#102d68;--muted:#617ca8;--line:#dceaff;--bg:#f4f8ff;--white:#fff;--shadow:0 5px 18px #3868a510;--radius:17px}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:86px}body{margin:0;background:linear-gradient(135deg,#f6faff,#fff 48%,#f2f8ff);font-family:Inter,"Segoe UI",Arial,sans-serif;color:var(--ink);font-size:14px}button,input,textarea{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #92c4ff;outline-offset:2px}a{color:inherit}.topbar{height:68px;position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:22px;padding:0 24px;background:#ffffffed;border-bottom:1px solid #e4efff;backdrop-filter:blur(14px)}.brand{display:flex;align-items:center;gap:12px;min-width:240px}.brand-mark{width:50px;height:50px;display:grid;place-items:center;font-size:37px;line-height:1;color:#368cf0;text-shadow:3px 3px #ff80b2,-3px 3px #75d9ba}.brand h1{font-size:21px;line-height:1.15;margin:0;font-weight:850;color:#123d91}.brand p{font-size:12px;margin:4px 0 0;color:#385b96}.top-note{flex:1;text-align:center;font-size:17px;color:#14489f;font-style:italic;font-weight:650;letter-spacing:.2px}.top-actions{display:flex;align-items:center;gap:15px}.searchbox{width:250px;display:flex;gap:8px;align-items:center;padding:10px 14px;background:white;border:1px solid #e4edfc;border-radius:30px;color:#6882ad}.searchbox input{width:100%;border:0;outline:0;color:var(--ink);min-width:0}.notification{border:0;background:transparent;font-size:22px;position:relative;color:#214c99}.notification b{position:absolute;right:-3px;top:-4px;background:#ff526b;color:white;font-size:10px;border-radius:99px;padding:2px 5px}.user-pill{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:650}.user-pill img{width:39px;height:39px;border-radius:50%;object-fit:cover;border:2px solid #e7efff}
+.app-layout{display:grid;grid-template-columns:246px minmax(480px,1fr) 354px;gap:16px;max-width:1800px;margin:0 auto;padding:0 16px 16px}.sidebar{position:sticky;top:68px;height:calc(100vh - 68px);min-height:680px;display:flex;flex-direction:column;background:linear-gradient(180deg,#fff,#f5faff);border-right:1px solid #e5efff;border-radius:0 0 18px 18px;padding:24px 0 0;overflow:hidden}.side-links{display:grid;gap:7px;padding:0 10px}.side-link{border:0;background:transparent;display:flex;align-items:center;gap:15px;text-align:left;padding:13px 15px;border-radius:16px;color:#17366e;font-weight:650}.side-link .nav-ico{width:28px;font-size:22px;text-align:center;color:#3764a8}.side-link.active,.side-link:hover{background:linear-gradient(100deg,#367ff2,#4d86ed);color:white}.side-link.active .nav-ico,.side-link:hover .nav-ico{color:white}.side-quote{margin:auto 22px 25px;text-align:center;color:#164aa5;font-size:19px;font-style:italic;line-height:1.55;transform:rotate(-3deg)}.side-quote span{display:block;font-size:28px;margin-top:6px}.side-landscape{height:155px;flex-shrink:0;background:linear-gradient(180deg,#eaf8ff,#d8f2e9);position:relative;overflow:hidden}.side-landscape:before{content:'🌿  🌼  🌱  🌷';position:absolute;bottom:20px;left:8px;font-size:32px;letter-spacing:3px}.school-foot{padding:13px 18px;display:flex;align-items:center;gap:12px;font-size:11px;line-height:1.6;background:#f8fbff}.school-foot strong{font-size:12px}.school-icon{font-size:25px;color:#3276e4}
+.center{min-width:0;padding:14px 0}
+/* Thêm các định dạng CSS khác từ file gốc của bạn ở đây */
+</style>
 </head>
 <body>
-    <div id="app">
-        <h1>CARE AI</h1>
-        <div id="chat-container"></div>
-        <input type="text" id="userInput" placeholder="Nhập tâm sự của em..." />
-        <button onclick="handleSend()">Gửi</button>
+    <div class="topbar">
+        <div class="brand">
+            <div class="brand-mark">🧠</div>
+            <div>
+                <h1>CARE AI</h1>
+                <p>Tư vấn tâm lý học đường</p>
+            </div>
+        </div>
+        <div class="top-note">"Lắng nghe, thấu hiểu, đồng hành cùng học sinh"</div>
+    </div>
+
+    <div class="app-layout">
+        <div class="center">
+            <div class="chat-shell">
+                <div class="chat-main">
+                    <div class="messages" id="chatMessages">
+                        <div class="bubble bot">Xin chào em! Cô là CARE AI, người luôn sẵn sàng lắng nghe những tâm sự, áp lực học tập hay cảm xúc của em. Em muốn chia sẻ điều gì với cô không?</div>
+                    </div>
+                    <div class="chat-form">
+                        <textarea id="userInput" placeholder="Nhập tâm sự của em..."></textarea>
+                        <button class="send" id="sendBtn" onclick="handleUserSend()">➤</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Hàm gọi trực tiếp Gemini API từ Frontend (trình duyệt)
+        // Hàm gọi trực tiếp Google Gemini API từ Frontend (trình duyệt)
         async function sendMessageToGemini(userText) {
-            const apiKey = "AQ.Ab8RN6LguUo-vcNut1OGoEVyMWcKvz0mVwVY8Du8VZezjANamQ";
-            const model = "gemini-3.5-flash-lite"; // Đã sửa lại tên model chuẩn
+            const apiKey = "AQ.Ab8RN6LguUo-vcNut1OGoEVyMWcKvz0mVwVY8Du8VZezjANamQ"; // API Key của bạn
+            const model = "gemini-3.5-flash-lite";
 
             try {
                 const response = await fetch(
@@ -34,28 +62,41 @@
                 const result = await response.json();
                 
                 if (!response.ok) {
-                    throw new Error(result.error?.message || "Lỗi kết nối API");
+                    throw new Error(result.error?.message || "Lỗi kết nối Google API");
                 }
 
                 const reply = (result.candidates || []).flatMap(
                     candidate => candidate.content && candidate.content.parts || []
                 ).map(part => part.text).join("\n").trim();
 
-                return reply || "Em hãy thử lại sau nhé.";
+                return reply || "Em chưa nhận được câu trả lời phù hợp.";
             } catch (error) {
                 console.error("Lỗi:", error);
                 return "Hệ thống đang bận, em hãy thử lại sau nhé.";
             }
         }
 
-        async function handleSend() {
+        async function handleUserSend() {
             const input = document.getElementById("userInput");
+            const messagesBox = document.getElementById("chatMessages");
             const text = input.value.trim();
             if (!text) return;
-            
-            console.log("Đang gửi:", text);
+
+            // Hiển thị tin nhắn người dùng
+            messagesBox.innerHTML += `<div class="bubble user">${escapeHtml(text)}</div>`;
+            input.value = "";
+            messagesBox.scrollTop = messagesBox.scrollHeight;
+
+            // Hiển thị trạng thái đang trả lời hoặc gọi API
             const reply = await sendMessageToGemini(text);
-            alert(reply); 
+
+            // Hiển thị phản hồi từ Gemini
+            messagesBox.innerHTML += `<div class="bubble bot">${escapeHtml(reply)}</div>`;
+            messagesBox.scrollTop = messagesBox.scrollHeight;
+        }
+
+        function escapeHtml(string) {
+            return string.replace(/&/g, "&").replace(/</g, "<").replace(/>/g, ">");
         }
     </script>
 </body>
