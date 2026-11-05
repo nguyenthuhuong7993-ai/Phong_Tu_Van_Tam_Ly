@@ -915,7 +915,7 @@ async function sendMessage(text){
     const controller=new AbortController();requestTimeout=setTimeout(()=>controller.abort(),45000);
     
     // Cấu hình gọi trực tiếp Google Gemini API
-    const apiKey = "AIzaSyC9vq-dmi9cEC5EPgKPcxVDTCp1vrVfeMI";
+    const apiKey = "AIzaSyA1rMDitNACk13fCyaPlSN288pfhHp_ZSs";
     const model = "gemini-3.5-flash-lite";
     const directApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
