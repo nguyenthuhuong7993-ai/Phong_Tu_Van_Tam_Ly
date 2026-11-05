@@ -20,13 +20,13 @@
 .mobile-chat-backdrop{display:none}
 @media(max-width:760px){
   .rightbar.mobile-chat-open{display:flex!important;position:fixed;inset:0;z-index:1000;max-width:none;width:100%;height:100dvh;overflow:auto;padding:12px;background:#102d684d;backdrop-filter:blur(3px);gap:0;}
-  .rightbar.mobile-chat-open .chat-preview{display:flex;flex-direction:column;position:relative;width:100%;max-width:560px;max-height:calc(100dvh - 24px);margin:auto;padding:14px;overflow:auto;border-radius:20px;background:#f7fbff;box-shadow:0 18px 55px #123d9140;}
+  .rightbar.mobile-chat-open .chat-preview{dd,.rightbar.mobile-chat-open .quick-help{display:none;}
+  .chat-close-mobile{display:inline-flex;isplay:flex;flex-direction:column;position:relative;width:100%;max-width:560px;max-height:calc(100dvh - 24px);margin:auto;padding:14px;overflow:auto;border-radius:20px;background:#f7fbff;box-shadow:0 18px 55px #123d9140;}
   .rightbar.mobile-chat-open .preview-message{max-height:none;min-height:140px;overflow:auto;flex:1;}
   .rightbar.mobile-chat-open .suggestion-pills{grid-template-columns:1fr 1fr;}
   .rightbar.mobile-chat-open .suggestion-pills button{white-space:normal;min-height:42px;}
   .rightbar.mobile-chat-open .preview-input{position:sticky;bottom:0;background:#f7fbff;padding-top:8px;}
-  .rightbar.mobile-chat-open .positive-card,.rightbar.mobile-chat-open .quick-help{display:none;}
-  .chat-close-mobile{display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:50%;width:38px;height:38px;background:#e7f1ff;color:#174b9f;font-size:23px;flex-shrink:0;}
+  .rightbar.mobile-chat-open .positive-caralign-items:center;justify-content:center;border:0;border-radius:50%;width:38px;height:38px;background:#e7f1ff;color:#174b9f;font-size:23px;flex-shrink:0;}
 }
 @media(min-width:761px){.chat-close-mobile{display:none}}
 
@@ -914,29 +914,20 @@ async function sendMessage(text){
   try{
     const controller=new AbortController();requestTimeout=setTimeout(()=>controller.abort(),45000);
     
-    // Cấu hình gọi trực tiếp Google Gemini API
-    const apiKey = "AQ.Ab8RN6K2PDt4S1sO8dCL5B6cRIagP5p__JPaCzZMk-92DzPTAg";
-    const model = "gemini-3.5-flash-lite";
-    const directApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+    // Trỏ về đúng Worker URL của bạn
+    const WORKER_URL = "https://phong-tu-van-tam-ly.nguyenthuhuong7993.workers.dev/";
 
-    const systemInstruction = "Trả lời bằng tiếng Việt tự nhiên trong vai Cô Hường, giáo viên tư vấn tâm lý học đường. Trước hết xác định nhu cầu thực sự của học sinh, không bắt buộc câu hỏi giống câu mẫu. Dùng các mục knowledgeContext có ý nghĩa tương đương, tổng hợp chứ không chép máy móc; trả lời đúng trọng tâm, ấm áp, cụ thể với 2-4 bước vừa sức. Không bịa dữ kiện hoặc chẩn đoán. Nếu thiếu thông tin quan trọng, hỏi một câu làm rõ. Nếu có nguy cơ an toàn, ưu tiên hướng dẫn tìm người lớn đáng tin cậy hỗ trợ trực tiếp.";
-    const knowledgeStr = getRelevantKnowledge(content, 8);
-    const fullTextPrompt = `${systemInstruction}\nKiến thức tham khảo: ${knowledgeStr}\nHọc sinh hỏi: ${content}`;
-
-    const contentsArray = chatHistory.slice(-12).map(item => ({
-      role: item.role === "assistant" ? "model" : "user",
-      parts: [{ text: item.content }]
-    }));
-    contentsArray.push({
-      role: "user",
-      parts: [{ text: fullTextPrompt }]
-    });
-
-    const response=await fetch(directApiUrl,{
+    const response=await fetch(WORKER_URL,{
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({
-        contents: contentsArray
+        message: content,
+        input: content,
+        history: chatHistory.slice(-12),
+        messages: chatHistory.slice(-12),
+        knowledgeContext: getRelevantKnowledge(content, 8),
+        responseGuidance: "Trả lời bằng tiếng Việt tự nhiên trong vai Cô Hường, giáo viên tư vấn tâm lý học đường. Trước hết xác định nhu cầu thực sự của học sinh, không bắt buộc câu hỏi giống câu mẫu. Dùng các mục knowledgeContext có ý nghĩa tương đương, tổng hợp chứ không chép máy móc; trả lời đúng trọng tâm, ấm áp, cụ thể với 2-4 bước vừa sức. Không bịa dữ kiện hoặc chẩn đoán. Nếu thiếu thông tin quan trọng, hỏi một câu làm rõ. Nếu có nguy cơ an toàn, ưu tiên hướng dẫn tìm người lớn đáng tin cậy hỗ trợ trực tiếp.",
+        knowledgeContextPolicy: "Chọn theo ý nghĩa tương đương, không chỉ theo từ trùng nhau."
       }),
       signal:controller.signal
     });
@@ -948,12 +939,7 @@ async function sendMessage(text){
       const detail=(data&&typeof data==="object"&&(data.error||data.message))||"Máy chủ AI chưa xử lý được yêu cầu.";
       throw new Error("Lỗi "+response.status+": "+(typeof detail === "object" ? detail.message : detail));
     }
-    
-    // Trích xuất phản hồi chuẩn từ Google Gemini API
-    const reply = (data.candidates || []).flatMap(
-      candidate => candidate.content && candidate.content.parts || []
-    ).map(part => part.text).join("\n").trim();
-
+    const reply=extractReply(data);
     if(!reply) throw new Error("Máy chủ đã phản hồi nhưng định dạng câu trả lời chưa được nhận diện.");
     addBubble(reply,"bot");chatHistory.push({role:"assistant",content:reply});
   }catch(err){
@@ -964,12 +950,6 @@ async function sendMessage(text){
     chatHistory.push({role:"assistant",content:localReply});
   }finally{clearTimeout(requestTimeout);isSending=false;$("userInput").focus({preventScroll:true})}
 }
-$("chatForm").addEventListener("submit",e=>{e.preventDefault();sendMessage($("userInput").value)});
-$("userInput").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();$("chatForm").requestSubmit()}});
-$("userInput").addEventListener("input",e=>{e.target.style.height="auto";e.target.style.height=Math.min(e.target.scrollHeight,130)+"px"});
-document.querySelectorAll(".suggestions button").forEach(b=>b.addEventListener("click",()=>sendMessage(b.textContent)));
-$("clearChat").addEventListener("click",()=>{messages.innerHTML="";chatHistory=[];addBubble("Mình bắt đầu cuộc trò chuyện mới nhé 💙 Em có thể chia sẻ điều đang khiến em băn khoăn. Đừng gửi thông tin nhận dạng riêng tư.","bot")});
-$("year").textContent=new Date().getFullYear();
 
 function makeQR() {
   const box = $("qrBox");
