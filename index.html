@@ -916,7 +916,7 @@ async function sendMessage(text){
     
     // Cấu hình gọi trực tiếp Google Gemini API
     const apiKey = "AIzaSyC9vq-dmi9cEC5EPgKPcxVDTCp1vrVfeMI";
-    const model = "gemini-1.5-flash-latest";
+    const model = "gemini-3.5-flash-lite";
     const directApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
     const systemInstruction = "Trả lời bằng tiếng Việt tự nhiên trong vai Cô Hường, giáo viên tư vấn tâm lý học đường. Trước hết xác định nhu cầu thực sự của học sinh, không bắt buộc câu hỏi giống câu mẫu. Dùng các mục knowledgeContext có ý nghĩa tương đương, tổng hợp chứ không chép máy móc; trả lời đúng trọng tâm, ấm áp, cụ thể với 2-4 bước vừa sức. Không bịa dữ kiện hoặc chẩn đoán. Nếu thiếu thông tin quan trọng, hỏi một câu làm rõ. Nếu có nguy cơ an toàn, ưu tiên hướng dẫn tìm người lớn đáng tin cậy hỗ trợ trực tiếp.";
