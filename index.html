@@ -536,6 +536,25 @@ body.student-entry-locked{overflow:hidden}body.student-entry-locked>.topbar,body
  .mobile-nav .care-mobile-game-link:focus-visible{outline:3px solid #92c4ff;outline-offset:-3px}
 }
 </style>
+<style id="care-mobile-menu-fix">
+.care-menu-toggle,.care-menu-backdrop,.care-menu-drawer{display:none}
+@media(max-width:760px){
+ .care-menu-toggle{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;width:42px;height:42px;border:1px solid #dbe5fa;border-radius:12px;background:#fff;color:#23477e;font-size:23px;cursor:pointer}
+ .care-menu-backdrop.is-open{display:block;position:fixed;inset:0;background:rgba(12,27,58,.5);z-index:1200}
+ .care-menu-drawer{display:block;position:fixed;top:0;bottom:0;left:0;width:min(340px,88vw);overflow-y:auto;background:#f8fbff;z-index:1201;box-shadow:8px 0 35px #142c4a33;transform:translateX(-110%);transition:transform .22s ease;visibility:hidden;padding:18px 14px calc(30px + env(safe-area-inset-bottom))}
+ .care-menu-drawer.is-open{transform:translateX(0);visibility:visible}
+ .care-menu-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:15px;color:#173e80;font-weight:800;font-size:19px}
+ .care-menu-close{border:0;background:#e9f0ff;border-radius:10px;padding:8px 13px;font-size:20px;color:#173e80}
+ .care-menu-items{display:flex;flex-direction:column;gap:6px}
+ .care-menu-items button,.care-menu-items a{display:flex;align-items:center;gap:12px;text-align:left;width:100%;padding:14px 12px;border:0;border-radius:12px;background:white;color:#234477;font-size:14px;font-weight:700;text-decoration:none;line-height:1.45;cursor:pointer}
+ .care-menu-items .nav-ico{width:25px;flex-shrink:0;text-align:center;font-size:20px}
+ .care-menu-items button.active{background:#e6efff;color:#2158d0}
+ .mobile-nav{justify-content:flex-start!important;overflow-x:auto!important;overflow-y:hidden;gap:8px;scrollbar-width:thin;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+ .mobile-nav>button,.mobile-nav>a{flex:0 0 auto!important;min-width:68px!important;display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:#5976a8;font-size:10px;font-weight:750;padding:5px 4px;white-space:nowrap}
+ .mobile-nav>a span{font-size:20px}
+ body.care-menu-open{overflow:hidden}
+}
+</style>
 </head>
 <body class="student-entry-locked">
 <section aria-labelledby="entryTitle" aria-modal="true" id="student-entry-gate" role="dialog">
@@ -629,7 +648,7 @@ body.student-entry-locked{overflow:hidden}body.student-entry-locked>.topbar,body
   });
 })();
 </script>
-<header class="topbar"><div class="brand"><div aria-hidden="true" class="brand-mark">💗</div><div><h1>CARE AI</h1><p>Tư vấn tâm lý học đường</p></div></div><div class="top-note">Lắng nghe – Thấu hiểu – Đồng hành ♡</div><div class="top-actions"><label class="searchbox">⌕ <input aria-label="Tìm kiếm" id="siteSearch" placeholder="Tìm kiếm..."/></label><div class="care-notice-host"><button aria-label="Thông báo lịch tư vấn" aria-expanded="false" aria-controls="careBookingNotices" class="notification" id="careBookingBell" type="button">🔔<b id="careBookingBadge" hidden>0</b></button><div class="care-notice-panel" id="careBookingNotices" hidden><div class="care-notice-head"><strong>🔔 Thông báo lịch tư vấn</strong><button type="button" id="careNoticeClose" aria-label="Đóng thông báo">✕</button></div><p class="care-notice-info">Yêu cầu được lưu trên trình duyệt này, chưa tự gửi đến giáo viên hoặc xác nhận lịch hẹn.</p><div id="careNoticeList"></div></div></div><div class="user-pill"><img alt="Avatar Robot AI CARE" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiB2aWV3Qm94PSIwIDAgMTI4IDEyOCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJiZyIgeDI9IjEiIHkyPSIxIj48c3RvcCBzdG9wLWNvbG9yPSIjZGZmN2ZmIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjYjdjY2ZmIi8+PC9saW5lYXJHcmFkaWVudD48bGluZWFyR3JhZGllbnQgaWQ9ImZhY2UiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2ZmZmZmZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2Q4ZWFmZiIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxjaXJjbGUgY3g9IjY0IiBjeT0iNjQiIHI9IjYyIiBmaWxsPSJ1cmwoI2JnKSIvPjxwYXRoIGQ9Ik02NCAyM3YxMyIgc3Ryb2tlPSIjNDQ2NWIyIiBzdHJva2Utd2lkdGg9IjYiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxjaXJjbGUgY3g9IjY0IiBjeT0iMjAiIHI9IjciIGZpbGw9IiM0OGNiZDUiLz48cmVjdCB4PSIyNCIgeT0iMzciIHdpZHRoPSI4MCIgaGVpZ2h0PSI2NiIgcng9IjI0IiBmaWxsPSIjNTg3YWM1Ii8+PHJlY3QgeD0iMzAiIHk9IjQyIiB3aWR0aD0iNjgiIGhlaWdodD0iNTYiIHJ4PSIxOSIgZmlsbD0idXJsKCNmYWNlKSIvPjxyZWN0IHg9IjE4IiB5PSI1OSIgd2lkdGg9IjExIiBoZWlnaHQ9IjIzIiByeD0iNSIgZmlsbD0iIzZkOTVkNyIvPjxyZWN0IHg9Ijk5IiB5PSI1OSIgd2lkdGg9IjExIiBoZWlnaHQ9IjIzIiByeD0iNSIgZmlsbD0iIzZkOTVkNyIvPjxlbGxpcHNlIGN4PSI0OCIgY3k9IjY1IiByeD0iOSIgcnk9IjExIiBmaWxsPSIjMjM4YmQ2Ii8+PGVsbGlwc2UgY3g9IjgwIiBjeT0iNjUiIHJ4PSI5IiByeT0iMTEiIGZpbGw9IiMyMzhiZDYiLz48Y2lyY2xlIGN4PSI1MSIgY3k9IjYxIiByPSIzIiBmaWxsPSJ3aGl0ZSIvPjxjaXJjbGUgY3g9IjgzIiBjeT0iNjEiIHI9IjMiIGZpbGw9IndoaXRlIi8+PHBhdGggZD0iTTUwIDgzcTE0IDEyIDI4IDAiIHN0cm9rZT0iIzUyNzdjNCIgc3Ryb2tlLXdpZHRoPSI1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiLz48Y2lyY2xlIGN4PSIzNSIgY3k9IjgxIiByPSI1IiBmaWxsPSIjZmZiNWM5IiBvcGFjaXR5PSIuNyIvPjxjaXJjbGUgY3g9IjkzIiBjeT0iODEiIHI9IjUiIGZpbGw9IiNmZmI1YzkiIG9wYWNpdHk9Ii43Ii8+PC9zdmc+"/><span>Xin chào,<br/>Học sinh THCS</span></div></div></header>
+<header class="topbar"><button class="care-menu-toggle" id="careMenuToggle" type="button" aria-label="Mở đầy đủ các mục CARE" aria-controls="careMenuDrawer" aria-expanded="false">☰</button><div class="brand"><div aria-hidden="true" class="brand-mark">💗</div><div><h1>CARE AI</h1><p>Tư vấn tâm lý học đường</p></div></div><div class="top-note">Lắng nghe – Thấu hiểu – Đồng hành ♡</div><div class="top-actions"><label class="searchbox">⌕ <input aria-label="Tìm kiếm" id="siteSearch" placeholder="Tìm kiếm..."/></label><div class="care-notice-host"><button aria-label="Thông báo lịch tư vấn" aria-expanded="false" aria-controls="careBookingNotices" class="notification" id="careBookingBell" type="button">🔔<b id="careBookingBadge" hidden>0</b></button><div class="care-notice-panel" id="careBookingNotices" hidden><div class="care-notice-head"><strong>🔔 Thông báo lịch tư vấn</strong><button type="button" id="careNoticeClose" aria-label="Đóng thông báo">✕</button></div><p class="care-notice-info">Yêu cầu được lưu trên trình duyệt này, chưa tự gửi đến giáo viên hoặc xác nhận lịch hẹn.</p><div id="careNoticeList"></div></div></div><div class="user-pill"><img alt="Avatar Robot AI CARE" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiB2aWV3Qm94PSIwIDAgMTI4IDEyOCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJiZyIgeDI9IjEiIHkyPSIxIj48c3RvcCBzdG9wLWNvbG9yPSIjZGZmN2ZmIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjYjdjY2ZmIi8+PC9saW5lYXJHcmFkaWVudD48bGluZWFyR3JhZGllbnQgaWQ9ImZhY2UiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2ZmZmZmZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2Q4ZWFmZiIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxjaXJjbGUgY3g9IjY0IiBjeT0iNjQiIHI9IjYyIiBmaWxsPSJ1cmwoI2JnKSIvPjxwYXRoIGQ9Ik02NCAyM3YxMyIgc3Ryb2tlPSIjNDQ2NWIyIiBzdHJva2Utd2lkdGg9IjYiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxjaXJjbGUgY3g9IjY0IiBjeT0iMjAiIHI9IjciIGZpbGw9IiM0OGNiZDUiLz48cmVjdCB4PSIyNCIgeT0iMzciIHdpZHRoPSI4MCIgaGVpZ2h0PSI2NiIgcng9IjI0IiBmaWxsPSIjNTg3YWM1Ii8+PHJlY3QgeD0iMzAiIHk9IjQyIiB3aWR0aD0iNjgiIGhlaWdodD0iNTYiIHJ4PSIxOSIgZmlsbD0idXJsKCNmYWNlKSIvPjxyZWN0IHg9IjE4IiB5PSI1OSIgd2lkdGg9IjExIiBoZWlnaHQ9IjIzIiByeD0iNSIgZmlsbD0iIzZkOTVkNyIvPjxyZWN0IHg9Ijk5IiB5PSI1OSIgd2lkdGg9IjExIiBoZWlnaHQ9IjIzIiByeD0iNSIgZmlsbD0iIzZkOTVkNyIvPjxlbGxpcHNlIGN4PSI0OCIgY3k9IjY1IiByeD0iOSIgcnk9IjExIiBmaWxsPSIjMjM4YmQ2Ii8+PGVsbGlwc2UgY3g9IjgwIiBjeT0iNjUiIHJ4PSI5IiByeT0iMTEiIGZpbGw9IiMyMzhiZDYiLz48Y2lyY2xlIGN4PSI1MSIgY3k9IjYxIiByPSIzIiBmaWxsPSJ3aGl0ZSIvPjxjaXJjbGUgY3g9IjgzIiBjeT0iNjEiIHI9IjMiIGZpbGw9IndoaXRlIi8+PHBhdGggZD0iTTUwIDgzcTE0IDEyIDI4IDAiIHN0cm9rZT0iIzUyNzdjNCIgc3Ryb2tlLXdpZHRoPSI1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbGw9Im5vbmUiLz48Y2lyY2xlIGN4PSIzNSIgY3k9IjgxIiByPSI1IiBmaWxsPSIjZmZiNWM5IiBvcGFjaXR5PSIuNyIvPjxjaXJjbGUgY3g9IjkzIiBjeT0iODEiIHI9IjUiIGZpbGw9IiNmZmI1YzkiIG9wYWNpdHk9Ii43Ii8+PC9zdmc+"/><span>Xin chào,<br/>Học sinh THCS</span></div></div></header>
 <div class="app-layout">
 <aside class="sidebar"><nav aria-label="Menu chính" class="side-links"><button class="side-link active" data-page="home"><span class="nav-ico">⌂</span>Trang chủ</button><button class="side-link" data-page="emotion-scan"><span class="nav-ico">📷</span>Check in - Nhận diện cảm xúc</button><button class="side-link" data-page="emotion"><span class="nav-ico">☻</span>Analyze emotions - Giải mã cảm xúc</button><button class="side-link" data-open-chat=""><span class="nav-ico">▣</span>Reach out to AI - Trò chuyện với CARE AI</button><button class="side-link" data-page="booking"><span class="nav-ico">▦</span>Engage With counselor - Kết nối với tư vấn viên</button><button class="side-link" data-page="feedback"><span class="nav-ico">💙</span>Đánh giá sau tư vấn</button><button class="side-link" data-page="sharing"><span class="nav-ico">♡</span>Góc chia sẻ</button><button class="side-link" data-page="resources"><span class="nav-ico">▤</span>Tài liệu &amp; Kỹ năng sống</button><a class="side-link care-game-link" href="Goc_Giai_Tri/index2.html"><span class="nav-ico">🎮</span>Góc giải trí</a><button class="side-link" data-contact=""><span class="nav-ico">⚙</span>Cài đặt &amp; hỗ trợ</button></nav><div class="side-quote">“Bạn không đơn độc,<br/>luôn có người lắng nghe!”<span>♡</span></div><div aria-hidden="true" class="side-landscape"></div><div class="school-foot"><span class="school-icon">🏫</span><div><strong>Trường THCS Phụng Công</strong><br/>Đồng hành cùng học sinh</div></div></aside>
 <main class="center">
@@ -5810,6 +5829,31 @@ $('siteSearch').addEventListener('keydown',e=>{if(e.key==='Enter'){const q=e.tar
   close?.addEventListener('click',()=>{panel.hidden=true;bell.setAttribute('aria-expanded','false');});
   document.addEventListener('click',e=>{if(!panel.hidden&&!e.target.closest('.care-notice-host')){panel.hidden=true;bell.setAttribute('aria-expanded','false');}});
   render();
+})();
+</script>
+<div class="care-menu-backdrop" id="careMenuBackdrop"></div>
+<aside class="care-menu-drawer" id="careMenuDrawer" aria-label="Tất cả các mục CARE" aria-hidden="true"><div class="care-menu-head"><span>💙 Các mục CARE-THCS</span><button class="care-menu-close" id="careMenuClose" type="button" aria-label="Đóng menu">✕</button></div><nav class="care-menu-items" id="careMenuItems" aria-label="Menu CARE trên điện thoại"></nav></aside>
+<script id="care-mobile-menu-sync">
+(function(){
+ const toggle=document.getElementById('careMenuToggle'),drawer=document.getElementById('careMenuDrawer'),backdrop=document.getElementById('careMenuBackdrop'),closeBtn=document.getElementById('careMenuClose'),list=document.getElementById('careMenuItems');
+ const source=document.querySelector('.side-links');
+ if(!toggle||!drawer||!backdrop||!list||!source)return;
+ function close(){drawer.classList.remove('is-open');backdrop.classList.remove('is-open');document.body.classList.remove('care-menu-open');drawer.setAttribute('aria-hidden','true');toggle.setAttribute('aria-expanded','false');toggle.focus();}
+ function open(){drawer.classList.add('is-open');backdrop.classList.add('is-open');document.body.classList.add('care-menu-open');drawer.setAttribute('aria-hidden','false');toggle.setAttribute('aria-expanded','true');closeBtn.focus();}
+ source.querySelectorAll('.side-link').forEach(original=>{
+   const item=document.createElement('button');item.type='button';item.innerHTML=original.innerHTML;
+   if(original.classList.contains('active'))item.classList.add('active');
+   item.addEventListener('click',()=>{
+     if(original.tagName==='A'){
+       const href=original.getAttribute('href');
+       if(href)window.location.href=href;
+     }else{original.click();}
+     list.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+     item.classList.add('active');close();
+   });list.appendChild(item);
+ });
+ toggle.addEventListener('click',open);closeBtn.addEventListener('click',close);backdrop.addEventListener('click',close);
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&drawer.classList.contains('is-open'))close();});
 })();
 </script>
 </body>
