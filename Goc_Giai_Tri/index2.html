@@ -23,6 +23,6 @@ const names=['Bóng bay cảm xúc','Thử thách trí nhớ','Hít thở cùng 
 const indexes=[0,3,6,7];
 function launch(i){document.body.classList.add('playing');document.getElementById('activeName').textContent=names[i];let frame=document.getElementById('frame');if(i===4){frame.srcdoc=sourceB;}else{frame.srcdoc=sourceGame;frame.onload=()=>{try{const w=frame.contentWindow;w.openGame(indexes[i]);}catch(e){console.warn(e)}frame.onload=null;};}}
 function exitGame(){const frame=document.getElementById('frame');frame.onload=null;frame.removeAttribute('srcdoc');frame.src='about:blank';document.body.classList.remove('playing')}
-function goCare(){if(history.length>1)history.back();else location.assign('index.html')}
+function goCare(){location.assign('../index.html')}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.classList.contains('playing'))exitGame()});
 </script></body></html>
