@@ -9,5 +9,12 @@
     "binding": "ASSETS",
     "not_found_handling": "single-page-application",
     "run_worker_first": true
-  }
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "care-region-db",
+      "database_id": "a8e462b3-1fcb-4ca7-b9b6-ccd886155645"
+    }
+  ]
 }
