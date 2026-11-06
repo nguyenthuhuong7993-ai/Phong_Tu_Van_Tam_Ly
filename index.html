@@ -574,6 +574,8 @@ body.student-entry-locked{overflow:hidden}body.student-entry-locked>.topbar,body
   }
   function enterRoom(profile) {
     window.studentProfile = profile;
+    // Only keep the current consultation identity within this browser tab.
+    try { sessionStorage.setItem('care_current_student_v1', JSON.stringify(profile)); } catch(e) {}
     document.body.classList.remove('student-entry-locked');
     gate?.remove();
     const userLabel = document.querySelector('.user-pill span');
@@ -583,6 +585,20 @@ body.student-entry-locked{overflow:hidden}body.student-entry-locked>.topbar,body
     }
     document.dispatchEvent(new CustomEvent('student-profile-ready', {detail: profile}));
   }
+  // Returning from the games is a continuation, not a new consultation.
+  // Do not bypass the entry screen for ordinary fresh visits.
+  try {
+    if (sessionStorage.getItem('care_return_from_games_v1') === '1') {
+      sessionStorage.removeItem('care_return_from_games_v1');
+      const saved = JSON.parse(sessionStorage.getItem('care_current_student_v1') || 'null');
+      if (saved && typeof saved.fullName === 'string') {
+        enterRoom(saved);
+        window.addEventListener('load', () => {
+          if (typeof window.showPage === 'function') window.showPage('home');
+        }, {once:true});
+      }
+    }
+  } catch(e) {}
   document.getElementById('careChooseDetails')?.addEventListener('click', () => {
     gate?.classList.remove('care-qr-choose-mode');
     gate?.classList.add('care-qr-form-mode');
