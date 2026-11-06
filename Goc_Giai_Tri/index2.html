@@ -23,6 +23,19 @@ const names=['Bóng bay cảm xúc','Thử thách trí nhớ','Hít thở cùng 
 const indexes=[0,3,6,7];
 function launch(i){document.body.classList.add('playing');document.getElementById('activeName').textContent=names[i];let frame=document.getElementById('frame');if(i===4){frame.srcdoc=sourceB;}else{frame.srcdoc=sourceGame;frame.onload=()=>{try{const w=frame.contentWindow;w.openGame(indexes[i]);}catch(e){console.warn(e)}frame.onload=null;};}}
 function exitGame(){const frame=document.getElementById('frame');frame.onload=null;frame.removeAttribute('srcdoc');frame.src='about:blank';document.body.classList.remove('playing')}
-function goCare(){location.assign('../index.html')}
+function goCare(){
+  try { sessionStorage.setItem('care_return_from_games_v1','1'); } catch(e) {}
+  // Restore the actual CARE page from browser history whenever possible.
+  // This preserves the existing consultation screen and its in-memory state.
+  try {
+    const previous = document.referrer ? new URL(document.referrer) : null;
+    if (previous && previous.origin === location.origin &&
+        !previous.pathname.includes('/Goc_Giai_Tri/') && history.length > 1) {
+      history.back();
+      return;
+    }
+  } catch(e) {}
+  location.assign('../index.html');
+}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.classList.contains('playing'))exitGame()});
 </script></body></html>
