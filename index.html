@@ -1439,9 +1439,9 @@ drawContinuous();
 <div class="toast" id="toast" role="status"></div>
 <script defer="" src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
-/* CẤU HÌNH TÍCH HỢP AI:
-   Frontend gọi Cloudflare Worker; KHÔNG đặt API key ở đây.
-   Endpoint đã được thiết lập trong các bước trước. */
+/* CẤU HÌNH CARE AI - ChatGPT/OpenAI:
+   Frontend gọi Cloudflare Worker, Worker dùng secret OPENAI_API_KEY.
+   Không đưa API key vào tệp HTML hoặc GitHub. */
 const WORKER_URL = "https://phong-tu-van-tam-ly.nguyenthuhuong7993.workers.dev/";
 const COUNSELOR = {
   name: "CARE - Giáo viên tư vấn tâm lý học đường",
@@ -1708,7 +1708,7 @@ async function sendMessage(text){
   addTyping();
   let requestTimeout;
   try{
-    // Chờ nạp tệp knowledge/tu-van-tam-ly.json để gửi nội dung liên quan cho Gemini.
+    // Chờ nạp kho kiến thức riêng để gửi nội dung liên quan cho CARE AI (OpenAI qua Worker).
     await loadCareKnowledge();
     const controller=new AbortController();requestTimeout=setTimeout(()=>controller.abort(),45000);
     const response=await fetch(WORKER_URL,{
