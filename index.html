@@ -1576,13 +1576,13 @@ function localKnowledgeAnswer(text){
     ];
     const urgent = urgentTerms.some(term => q.includes(localNormalize(term)));
     if(urgent){
-      return `<p>Cô Hường rất lo cho sự an toàn của em và cảm ơn em đã nói với cô. 💜</p>
-      <p><b>Em đừng tự xử lý chuyện này một mình nhé.</b> Hãy tìm ngay một người lớn đáng tin cậy ở gần em như bố mẹ/người thân, giáo viên chủ nhiệm hoặc cán bộ tư vấn học đường và nói rõ rằng em cần được giúp đỡ ngay.</p>
-      <p>Nếu em hoặc ai đó đang gặp nguy hiểm ngay lúc này, hãy đến nơi an toàn, nhờ người lớn gọi dịch vụ khẩn cấp tại địa phương và đừng ở một mình. Em hiện có đang ở nơi an toàn và có người lớn đáng tin cậy ở cạnh không?</p>`;
+      return `<p>CARE rất lo cho sự an toàn của bạn và cảm ơn bạn đã nói với CARE. 💜</p>
+      <p><b>Bạn đừng tự xử lý chuyện này một mình nhé.</b> Hãy tìm ngay một người lớn đáng tin cậy ở gần bạn như bố mẹ/người thân, giáo viên chủ nhiệm hoặc cán bộ tư vấn học đường và nói rõ rằng em cần được giúp đỡ ngay.</p>
+      <p>Nếu bạn hoặc ai đó đang gặp nguy hiểm ngay lúc này, hãy đến nơi an toàn, nhờ người lớn gọi dịch vụ khẩn cấp tại địa phương và đừng ở một mình. bạn hiện có đang ở nơi an toàn và có người lớn đáng tin cậy ở cạnh không?</p>`;
     }
 
     if(!queryWords.length){
-      return "Cô Hường đang lắng nghe em 💜 Em hãy kể cho cô điều em đang suy nghĩ hoặc điều khiến em lo lắng nhé.";
+      return "CARE đang lắng nghe bạn 💜 bạn hãy kể cho CARE điều bạn đang suy nghĩ hoặc điều khiến bạn lo lắng nhé.";
     }
 
     let best = null;
@@ -1620,7 +1620,7 @@ function localKnowledgeAnswer(text){
       return reply;
     }
 
-    return `<p>Cô Hường đang lắng nghe em 💜</p>
+    return `<p>CARE đang lắng nghe em 💜</p>
             <p>Cô chưa tìm thấy câu trả lời thật sát với điều em vừa hỏi.</p>
             <p>Em có thể kể cụ thể hơn điều gì đã xảy ra, em đang cảm thấy thế nào và điều gì khiến em lo nhất không? Cô sẽ cùng em tìm bước tiếp theo phù hợp. Nếu chuyện liên quan đến an toàn của em hoặc người khác, hãy báo ngay cho một người lớn đáng tin cậy.</p>`;
   }
@@ -1694,10 +1694,10 @@ function getLocalFallbackReply(text){
     const formatted = localKnowledgeAnswer(text);
     const box = document.createElement("div");
     box.innerHTML = formatted;
-    return (box.textContent || box.innerText || "").trim() || "Cô Hường đang lắng nghe em. Em có thể kể cụ thể hơn để cô hỗ trợ nhé.";
+    return (box.textContent || box.innerText || "").trim() || "CARE đang lắng nghe bạn. bạn có thể kể cụ thể hơn để cô hỗ trợ nhé.";
   } catch (e) {
     console.warn("Local knowledge fallback error:", e);
-    return "Cô Hường đang lắng nghe em. Hiện kết nối AI chưa ổn định; em hãy thử diễn đạt câu hỏi theo cách khác hoặc thử lại sau nhé.";
+    return "CARE đang lắng nghe bạn. Hiện kết nối AI chưa ổn định; bạn hãy thử diễn đạt câu hỏi theo cách khác hoặc thử lại sau nhé.";
   }
 }
 
@@ -1714,7 +1714,7 @@ async function sendMessage(text){
     const response=await fetch(WORKER_URL,{
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({message:content,input:content,history:chatHistory.slice(-12),messages:chatHistory.slice(-12),knowledgeContext:getRelevantKnowledge(content,8),responseGuidance:"Trả lời bằng tiếng Việt tự nhiên trong vai Cô Hường, giáo viên tư vấn tâm lý học đường. Trước hết xác định nhu cầu thực sự của học sinh, không bắt buộc câu hỏi giống câu mẫu. Dùng các mục knowledgeContext có ý nghĩa tương đương, tổng hợp chứ không chép máy móc; trả lời đúng trọng tâm, ấm áp, cụ thể với 2-4 bước vừa sức. Không bịa dữ kiện hoặc chẩn đoán. Nếu thiếu thông tin quan trọng, hỏi một câu làm rõ. Nếu có nguy cơ an toàn, ưu tiên hướng dẫn tìm người lớn đáng tin cậy hỗ trợ trực tiếp.",knowledgeContextPolicy:"Chọn theo ý nghĩa tương đương, không chỉ theo từ trùng nhau."}),
+      body:JSON.stringify({message:content,input:content,history:chatHistory.slice(-12),messages:chatHistory.slice(-12),knowledgeContext:getRelevantKnowledge(content,8),responseGuidance:"Trả lời bằng tiếng Việt tự nhiên trong vai CARE, AI tư vấn tâm lý học đường. Trước hết xác định nhu cầu thực sự của học sinh, không bắt buộc câu hỏi giống câu mẫu. Dùng các mục knowledgeContext có ý nghĩa tương đương, tổng hợp chứ không chép máy móc; trả lời đúng trọng tâm, ấm áp, cụ thể với 2-4 bước vừa sức. Không bịa dữ kiện hoặc chẩn đoán. Nếu thiếu thông tin quan trọng, hỏi một câu làm rõ. Nếu có nguy cơ an toàn, ưu tiên hướng dẫn tìm người lớn đáng tin cậy hỗ trợ trực tiếp.",knowledgeContextPolicy:"Chọn theo ý nghĩa tương đương, không chỉ theo từ trùng nhau."}),
       signal:controller.signal
     });
     clearTimeout(requestTimeout);
@@ -1942,7 +1942,7 @@ $('previewForm').addEventListener('submit',e=>{e.preventDefault();const val=$('p
 document.querySelectorAll('.suggestion-pills button').forEach(b=>b.addEventListener('click',()=>{const text=b.textContent.trim();openChat();sendMessage(text);}));
 let chosenEmotion='';document.querySelectorAll('[data-emotion]').forEach(b=>b.addEventListener('click',()=>{chosenEmotion=b.dataset.emotion;document.querySelectorAll('[data-emotion]').forEach(x=>x.classList.toggle('selected',x===b));}));
 $('saveEmotion').addEventListener('click',()=>{if(!chosenEmotion){$('journalResult').textContent='Bạn hãy chọn một cảm xúc trước nhé.';}else{$('journalResult').textContent='Bạn đã ghi nhận cảm xúc: '+chosenEmotion+'. '+($('emotionNote').value.trim()?'Ghi chú: '+$('emotionNote').value.trim():'Cảm ơn bạn đã dành thời gian lắng nghe bản thân.');} $('journalResult').classList.add('show');});
-$('bookingForm').addEventListener('submit',e=>{e.preventDefault();const date=$('bookingDate').value;if(!date)return;const appointment={name:$('bookingName').value.trim(),date:date,time:$('bookingTime').value,topic:$('bookingTopic').value.trim(),status:'Học sinh đã nhập yêu cầu; cần xác nhận với giáo viên'};window.counselingAppointment=appointment;window.careRecordBookingNotice?.(appointment);const msg='Xin chào Cô Hường, em muốn xin lịch tư vấn. Ngày mong muốn: '+date+'; khung giờ: '+appointment.time+'. '+(appointment.name?'Tên xưng hô: '+appointment.name+'. ':'')+(appointment.topic?'Nội dung: '+appointment.topic:'');$('bookingResult').textContent='Đã ghi nhận yêu cầu lịch hẹn trên phiên hiện tại. Bạn có thể gửi qua email hoặc gọi 0989836893 để xác nhận. Lịch chưa được đặt tự động.';$('bookingResult').classList.add('show');});
+$('bookingForm').addEventListener('submit',e=>{e.preventDefault();const date=$('bookingDate').value;if(!date)return;const appointment={name:$('bookingName').value.trim(),date:date,time:$('bookingTime').value,topic:$('bookingTopic').value.trim(),status:'Học sinh đã nhập yêu cầu; cần xác nhận với giáo viên'};window.counselingAppointment=appointment;window.careRecordBookingNotice?.(appointment);const msg='Xin chào CARE, mình muốn xin lịch tư vấn. Ngày mong muốn: '+date+'; khung giờ: '+appointment.time+'. '+(appointment.name?'Tên xưng hô: '+appointment.name+'. ':'')+(appointment.topic?'Nội dung: '+appointment.topic:'');$('bookingResult').textContent='Đã ghi nhận yêu cầu lịch hẹn trên phiên hiện tại. Bạn có thể gửi qua email hoặc gọi 0989836893 để xác nhận. Lịch chưa được đặt tự động.';$('bookingResult').classList.add('show');});
 
 $('siteSearch').addEventListener('keydown',e=>{if(e.key==='Enter'){const q=e.target.value.trim();if(q){openChat();$('previewInput').value='Em muốn tìm hiểu về '+q;$('previewInput').focus({preventScroll:true});}}});
 </script>
