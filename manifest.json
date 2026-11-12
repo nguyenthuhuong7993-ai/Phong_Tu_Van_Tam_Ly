@@ -1,7 +1,7 @@
 {
   "name": "CARE - Tư vấn Tâm lý Học đường",
   "short_name": "CARE AI",
-  "description": "Không gian tư vấn tâm lý học đường và trò chuyện cùng trợ lý AI.",
+  "description": "CARE AI - Điểm tựa cảm xúc",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
