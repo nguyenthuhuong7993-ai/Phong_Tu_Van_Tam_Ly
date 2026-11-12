@@ -644,7 +644,7 @@ body.student-entry-locked{overflow:hidden}body.student-entry-locked>.topbar,body
 </div>
 <form class="entry-card" id="studentEntryForm">
 <h2 id="entryTitle">Bắt đầu buổi tư vấn</h2>
-<label class="entry-field">Hồ sơ <input id="studentFullName" name="studentFullName" type="text" value="HS01" readonly tabindex="-1" aria-label="Mã hồ sơ tự động, không thể chỉnh sửa"/></label>
+<label class="entry-field">Hồ sơ <input id="studentFullName" name="studentFullName" type="text" value="Đang tải mã hồ sơ..." readonly tabindex="-1" aria-label="Mã hồ sơ tự động, không thể chỉnh sửa"/></label>
 <label class="entry-field">Trường <select id="studentSchool" name="studentSchool" required><option value="" selected disabled>Chọn trường</option><option value="PC-TC">PC-TC</option><option value="PC-PH1">PC-PH1</option><option value="PC-PH2">PC-PH2</option><option value="Khác">Khác</option></select></label>
 <label class="entry-field">Khối <select id="studentClass" name="studentClass" required><option value="" selected disabled>Chọn khối</option><option value="Lớp 6">Lớp 6</option><option value="Lớp 7">Lớp 7</option><option value="Lớp 8">Lớp 8</option><option value="Lớp 9">Lớp 9</option><option value="Khác">Khác</option></select></label>
 <button class="entry-submit" type="submit">Xác nhận và vào phòng tư vấn →</button>
@@ -671,26 +671,66 @@ body.student-entry-locked{overflow:hidden}body.student-entry-locked>.topbar,body
     // Remove QR query parameters without reloading, so refresh does not unexpectedly skip a choice.
     // Preserve the URL on initial visit to allow the user to refresh the choice screen.
   }
-  // Bộ đếm hồ sơ lưu trong trình duyệt. Cần API + cơ sở dữ liệu để dùng chung trên mọi thiết bị.
-  const COUNTER_KEY = 'care_student_record_counter_v1';
-  let volatileCounter = 0;
-  function readCounter() {
-    try { return Math.max(0, Number.parseInt(localStorage.getItem(COUNTER_KEY) || '0',10) || 0); }
-    catch (e) { return volatileCounter; }
+  // CARE-THCS: mã hồ sơ cấp tập trung qua Cloudflare D1, không đếm bằng localStorage.
+  const CARE_RECORD_API = 'https://phong-tu-van-tam-ly.nguyenthuhuong7993.workers.dev';
+  let recordAllocating = false;
+  const recordInput = document.getElementById('studentFullName');
+  const formSubmit = form?.querySelector('button[type="submit"]');
+  const anonSubmit = document.getElementById('careChooseAnonymous');
+  function setRecordStatus(message) {
+    if (recordInput) recordInput.value = message;
   }
-  function formatRecord(n) { return 'HS' + String(n).padStart(2,'0'); }
-  function previewRecord() {
-    const input = document.getElementById('studentFullName');
-    if (input) input.value = formatRecord(readCounter()+1);
+  async function careRecordRequest(path, method = 'GET') {
+    const response = await fetch(CARE_RECORD_API + path, {
+      method,
+      headers: method === 'POST' ? {'Content-Type':'application/json'} : {},
+      ...(method === 'POST' ? {body: '{}'} : {}),
+      cache: 'no-store',
+      signal: AbortSignal.timeout(15000)
+    });
+    let data = {};
+    try { data = await response.json(); } catch(e) {}
+    if (!response.ok || data.ok !== true) {
+      throw new Error(data.error || 'Không kết nối được dịch vụ cấp mã hồ sơ.');
+    }
+    return data;
   }
-  function allocateRecord() {
-    const next = readCounter()+1;
-    volatileCounter = next;
-    try { localStorage.setItem(COUNTER_KEY, String(next)); } catch (e) {}
-    return formatRecord(next);
+  async function previewRecord() {
+    if (recordAllocating || !document.body.classList.contains('student-entry-locked')) return;
+    setRecordStatus('Đang tải mã hồ sơ...');
+    try {
+      const data = await careRecordRequest('/api/record-preview');
+      if (!recordAllocating) setRecordStatus(data.nextRecordId || 'Chưa có mã');
+    } catch (err) {
+      if (!recordAllocating) setRecordStatus('Chưa kết nối');
+      console.warn('[CARE] Không lấy được mã hồ sơ xem trước:', err);
+    }
+  }
+  async function allocateRecordAndEnter(profileData) {
+    // Tránh cấp hai mã khi người dùng bấm nút liên tục.
+    if (recordAllocating) return;
+    recordAllocating = true;
+    if (formSubmit) formSubmit.disabled = true;
+    if (anonSubmit) anonSubmit.disabled = true;
+    setRecordStatus('Đang cấp mã hồ sơ...');
+    try {
+      const data = await careRecordRequest('/api/record-allocate', 'POST');
+      const recordId = String(data.recordId || '');
+      if (!/^HS[0-9]{2,}$/.test(recordId)) throw new Error('Mã hồ sơ trả về không hợp lệ.');
+      setRecordStatus(recordId);
+      enterRoom({ ...profileData, recordId, fullName: recordId });
+    } catch (err) {
+      console.error('[CARE] Không thể cấp mã hồ sơ:', err);
+      setRecordStatus('Chưa kết nối');
+      alert('CARE chưa thể cấp mã hồ sơ chung. Vui lòng kiểm tra kết nối mạng hoặc API Cloudflare rồi thử lại. Hệ thống sẽ không tự cấp mã HS01 để tránh trùng hồ sơ.');
+      recordAllocating = false;
+      if (formSubmit) formSubmit.disabled = false;
+      if (anonSubmit) anonSubmit.disabled = false;
+      previewRecord();
+    }
   }
   previewRecord();
-  window.addEventListener('pageshow',previewRecord);
+  window.addEventListener('pageshow', previewRecord);
   function enterRoom(profile) {
     window.studentProfile = profile;
     // Only keep the current consultation identity within this browser tab.
@@ -724,21 +764,18 @@ body.student-entry-locked{overflow:hidden}body.student-entry-locked>.topbar,body
     choice.hidden = true;
     document.getElementById('studentSchool')?.focus();
   });
-  document.getElementById('careChooseAnonymous')?.addEventListener('click', () => {
-    const recordId = allocateRecord();
-    enterRoom({recordId,fullName:recordId,school:'Không cung cấp',className:'Không cung cấp',anonymous:true});
+  document.getElementById('careChooseAnonymous')?.addEventListener('click', async () => {
+    await allocateRecordAndEnter({school:'Không cung cấp',className:'Không cung cấp',anonymous:true});
   });
-  form.addEventListener('submit', function(event) {
+  form.addEventListener('submit', async function(event) {
     event.preventDefault();
-    const fullName = document.getElementById('studentFullName')?.value.trim() || '';
     const school = document.getElementById('studentSchool')?.value.trim() || '';
     const className = document.getElementById('studentClass')?.value.trim() || '';
     if (!school || !className) {
       form.reportValidity();
       return;
     }
-    const recordId = allocateRecord();
-    enterRoom({recordId,fullName:recordId,school,className,anonymous:false});
+    await allocateRecordAndEnter({school,className,anonymous:false});
   });
 })();
 </script>
@@ -1442,7 +1479,7 @@ drawContinuous();
 /* CẤU HÌNH CARE AI - ChatGPT/OpenAI:
    Frontend gọi Cloudflare Worker, Worker dùng secret OPENAI_API_KEY.
    Không đưa API key vào tệp HTML hoặc GitHub. */
-const WORKER_URL = "https://phong-tu-van-tam-ly.nguyenthuhuong7993.workers.dev/";
+const WORKER_URL = "https://phong-tu-van-tam-ly.nguyenthuhuong7993.workers.dev/api/chat";
 const COUNSELOR = {
   name: "CARE - Giáo viên tư vấn tâm lý học đường",
   school: "Trường THCS",
@@ -1532,7 +1569,7 @@ async function loadCareKnowledge() {
       return rows;
     } catch(err) {
       console.warn("CARE: Không đọc được kho kiến thức bên ngoài. Kiểm tra đường dẫn, JSON và triển khai GitHub Pages/Cloudflare.", err);
-      // Khi không có file, tính năng Gemini vẫn gọi bình thường; cơ chế trả lời
+      // Khi không có file, ChatGPT qua Cloudflare Worker vẫn gọi bình thường; cơ chế trả lời
       // dự phòng dùng lời nhắn an toàn, không tạo ra kết quả kiến thức giả.
       return [];
     } finally {
@@ -1687,14 +1724,14 @@ function getLocalFallbackReply(text){
       const normalized = localNormalize(text);
       const safetyWords = ["tu tu","tu lam hai","khong muon song","muon chet","bi bao hanh","bi xam hai","bi de doa","khong an toan"];
       if (safetyWords.some(term => normalized.includes(term))) {
-        return "Cô rất quan tâm tới sự an toàn của em. Em hãy tìm ngay một người lớn đáng tin cậy ở gần như bố mẹ, giáo viên chủ nhiệm hoặc tư vấn viên nhà trường để được giúp đỡ. Nếu em đang gặp nguy hiểm, hãy nhờ người lớn liên hệ dịch vụ khẩn cấp tại nơi em sống. Em hiện có đang ở nơi an toàn không?";
+        return "CARE quan tâm đến sự an toàn của bạn. Bạn hãy tìm ngay một người lớn đáng tin cậy ở gần hoặc tư vấn viên nhà trường để được hỗ trợ. Nếu đang gặp nguy hiểm, hãy nhờ người lớn liên hệ dịch vụ khẩn cấp tại địa phương. Bạn có đang ở nơi an toàn không?";
       }
-      return "Cô đang lắng nghe em. Hiện chưa tải được kho kiến thức và kết nối AI chưa ổn định. Em có thể thử lại sau hoặc chia sẻ trực tiếp với giáo viên tư vấn của nhà trường nhé.";
+      return "CARE đang lắng nghe bạn. Kết nối ChatGPT hiện chưa ổn định. Bạn có thể thử lại hoặc trao đổi trực tiếp với tư vấn viên của nhà trường nhé.";
     }
     const formatted = localKnowledgeAnswer(text);
     const box = document.createElement("div");
     box.innerHTML = formatted;
-    return (box.textContent || box.innerText || "").trim() || "CARE đang lắng nghe bạn. bạn có thể kể cụ thể hơn để cô hỗ trợ nhé.";
+    return "CARE đang gặp lỗi kết nối ChatGPT. Bạn vui lòng thử lại sau hoặc liên hệ tư vấn viên nếu cần hỗ trợ trực tiếp.";
   } catch (e) {
     console.warn("Local knowledge fallback error:", e);
     return "CARE đang lắng nghe bạn. Hiện kết nối AI chưa ổn định; bạn hãy thử diễn đạt câu hỏi theo cách khác hoặc thử lại sau nhé.";
@@ -1714,7 +1751,7 @@ async function sendMessage(text){
     const response=await fetch(WORKER_URL,{
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({message:content,input:content,history:chatHistory.slice(-12),messages:chatHistory.slice(-12),knowledgeContext:getRelevantKnowledge(content,8),responseGuidance:"Trả lời bằng tiếng Việt tự nhiên trong vai CARE, AI tư vấn tâm lý học đường. Trước hết xác định nhu cầu thực sự của học sinh, không bắt buộc câu hỏi giống câu mẫu. Dùng các mục knowledgeContext có ý nghĩa tương đương, tổng hợp chứ không chép máy móc; trả lời đúng trọng tâm, ấm áp, cụ thể với 2-4 bước vừa sức. Không bịa dữ kiện hoặc chẩn đoán. Nếu thiếu thông tin quan trọng, hỏi một câu làm rõ. Nếu có nguy cơ an toàn, ưu tiên hướng dẫn tìm người lớn đáng tin cậy hỗ trợ trực tiếp.",knowledgeContextPolicy:"Chọn theo ý nghĩa tương đương, không chỉ theo từ trùng nhau."}),
+      body:JSON.stringify({message:content,history:chatHistory.slice(0,-1).slice(-12)}),
       signal:controller.signal
     });
     clearTimeout(requestTimeout);
@@ -1730,7 +1767,7 @@ async function sendMessage(text){
     addBubble(reply,"bot");chatHistory.push({role:"assistant",content:reply});
   }catch(err){
     $("typing")?.remove();
-    console.error("Chat integration error; switching to local knowledge:",err);
+    console.error("ChatGPT Worker connection error:",err);
     const localReply = getLocalFallbackReply(content);
     addBubble(localReply, "bot");
     chatHistory.push({role:"assistant",content:localReply});
@@ -1740,7 +1777,7 @@ $("chatForm").addEventListener("submit",e=>{e.preventDefault();sendMessage($("us
 $("userInput").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();$("chatForm").requestSubmit()}});
 $("userInput").addEventListener("input",e=>{e.target.style.height="auto";e.target.style.height=Math.min(e.target.scrollHeight,130)+"px"});
 document.querySelectorAll(".suggestions button").forEach(b=>b.addEventListener("click",()=>sendMessage(b.textContent)));
-$("clearChat").addEventListener("click",()=>{messages.innerHTML="";chatHistory=[];addBubble("Mình bắt đầu cuộc trò chuyện mới nhé 💙 Em có thể chia sẻ điều đang khiến em băn khoăn. Đừng gửi thông tin nhận dạng riêng tư.","bot")});
+$("clearChat").addEventListener("click",()=>{messages.innerHTML="";chatHistory=[];addBubble("CARE đã bắt đầu cuộc trò chuyện mới 💙 Bạn có thể chia sẻ điều đang khiến bạn băn khoăn. Đừng gửi thông tin nhận dạng riêng tư nhé.","bot")});
 $("year").textContent=new Date().getFullYear();
 
 function makeQR() {
