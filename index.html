@@ -1881,20 +1881,26 @@ $('feedbackForm').addEventListener('submit',async event=>{
     sessionDate:sessionDate,
     recordCode:window.CARERecord.code,
     careVersion:'CARE-THCS | Hồ sơ theo trình tự',
-    timeline:window.CARERecord.events,
-    transcriptFull:chatHistory.map((m,i)=>({thuTu:i+1,vaiTro:m.role==='user'?'Học sinh':'Trợ lý AI',noiDung:m.content}))
+    // Nội dung trò chuyện nguyên văn đã có trong summary (mục III).
+    // Không gửi transcriptFull lần hai để tránh HTTP 413.
+    timeline:window.CARERecord.events
   };
   try{
+    const payload=JSON.stringify(record);
+    console.info('CARE PDF payload bytes:',new Blob([payload]).size);
     const saveResponse=await fetch('https://luu-ho-so-tu-van-api.nguyenthuhuong7993.workers.dev/',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify(record)
+      body:payload
     });
     const responseText=await saveResponse.text();
     let saveData={};
     try{saveData=JSON.parse(responseText)}catch{saveData={raw:responseText}}
     if(!saveResponse.ok||saveData.ok!==true){
       const detail=saveData.error||saveData.message||saveData.raw||('HTTP '+saveResponse.status);
+      if(saveResponse.status===413){
+        throw new Error('Máy chủ lưu PDF từ chối dữ liệu (HTTP 413). Cần kiểm tra giới hạn kích thước ở Worker lưu hồ sơ hoặc Google Apps Script. Dung lượng gửi: '+new Blob([payload]).size+' byte.');
+      }
       throw new Error('Máy chủ trả về HTTP '+saveResponse.status+'. '+String(detail).slice(0,500));
     }
     saveStatus.textContent='Máy chủ xác nhận đã nhận và lưu hồ sơ. Cô vui lòng kiểm tra thư mục Google Drive để xác nhận file PDF.';
