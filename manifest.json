@@ -1,14 +1,17 @@
 {
   "name": "CARE - Tư vấn Tâm lý Học đường",
   "short_name": "CARE AI",
-  "description": "CARE AI - Điểm tựa cảm xúc",
-  "start_url": "./",
-  "scope": "./",
+  "description": "CARE-THCS - Điểm tựa cảm xúc",
+  "start_url": "/",
   "display": "standalone",
-  "orientation": "any",
-  "background_color": "#f2fcff",
-  "theme_color": "#dff5ff",
+  "background_color": "#ffffff",
+  "theme_color": "#2779d8",
   "icons": [
-    {"src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
   ]
 }
